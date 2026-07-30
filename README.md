@@ -33,7 +33,7 @@ frontend y backend.
 
 ## 1. Crear la base de datos
 
-Ejecuta `database/create-database.sql` desde SQL Server Management Studio,
+Ejecutar `database/create-database.sql` desde SQL Server Management Studio,
 Azure Data Studio o `sqlcmd`. El script puede ejecutarse más de una vez.
 
 Ejemplo con `sqlcmd`:
@@ -45,7 +45,7 @@ sqlcmd -S localhost -U sa -P "YourStrong!Passw0rd" -C -i database/create-databas
 ## 2. Ejecutar el backend
 
 Los valores por defecto esperan SQL Server en `localhost:1433`, usuario `sa` y
-contraseña `YourStrong!Passw0rd`. Puedes sobrescribirlos con variables de entorno:
+contraseña `YourStrong!Passw0rd`. Puede sobrescribirlos con variables de entorno:
 
 ```powershell
 cd backend
@@ -55,10 +55,7 @@ $env:JWT_SECRET="un-secreto-base64-de-al-menos-32-bytes"
 mvn spring-boot:run
 ```
 
-La API queda disponible en `http://localhost:8080`.
-
-> Para un entorno real, no uses el secreto JWT ni la contraseña de ejemplo.
-> El backend usa `ddl-auto=validate`: primero debe ejecutarse el script SQL.
+La API quedaría disponible en `http://localhost:8080`.
 
 Al iniciar por primera vez, el backend crea un usuario administrador con la
 contraseña almacenada mediante BCrypt:
@@ -76,7 +73,7 @@ npm install
 npm start
 ```
 
-Abre `http://localhost:4200` e inicia sesión con las credenciales de demostración.
+Abrir `http://localhost:4200` e iniciar sesión con las credenciales de demostración.
 
 ## API
 
@@ -102,7 +99,7 @@ Content-Type: application/json
 }
 ```
 
-Usa el token devuelto en los endpoints protegidos:
+Usar el token devuelto en los endpoints protegidos:
 
 ```http
 Authorization: Bearer <token>
