@@ -1,0 +1,98 @@
+<div class="shell">
+  <aside>
+    <div class="brand"><span class="brand-mark">P</span><span>StockFlow<small>INVENTORY</small></span></div>
+    <nav>
+      <a class="active"><span>▦</span> Productos</a>
+      <a class="disabled"><span>◫</span> Categorías</a>
+      <a class="disabled"><span>⌁</span> Movimientos</a>
+    </nav>
+    <div class="user">
+      <span class="avatar">{{ (auth.user()?.email || 'U').charAt(0).toUpperCase() }}</span>
+      <span><strong>{{ auth.user()?.email }}</strong><small>{{ auth.user()?.role }}</small></span>
+      <button (click)="logout()" title="Cerrar sesión">↪</button>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div>
+        <span class="eyebrow">INVENTARIO</span>
+        <h1>Gestión de productos</h1>
+        <p>Consulta y administra todos los productos de tu inventario.</p>
+      </div>
+      <button class="primary" (click)="openCreate()">＋ Nuevo producto</button>
+    </header>
+
+    <section class="stats">
+      <article><span class="icon teal">▦</span><div><small>PRODUCTOS</small><strong>{{ products().length }}</strong></div></article>
+      <article><span class="icon blue">≡</span><div><small>UNIDADES EN STOCK</small><strong>{{ totalStock() }}</strong></div></article>
+      <article><span class="icon gold">$</span><div><small>VALOR DEL INVENTARIO</small><strong>{{ inventoryValue() | currency:'USD' }}</strong></div></article>
+    </section>
+
+    @if (error()) {
+      <div class="alert">{{ error() }} <button (click)="load()">Reintentar</button></div>
+    }
+
+    <section class="table-card">
+      <div class="table-toolbar">
+        <div class="search">⌕ <input #searchInput type="search" placeholder="Buscar por nombre, tipo o descripción..."
+          (input)="search.set(searchInput.value)"></div>
+        <span>{{ filteredProducts().length }} resultados</span>
+      </div>
+
+      @if (loading()) {
+        <div class="empty">Cargando productos…</div>
+      } @else if (filteredProducts().length === 0) {
+        <div class="empty">
+          <strong>No hay productos para mostrar</strong>
+          <span>Crea tu primer producto o cambia el término de búsqueda.</span>
+        </div>
+      } @else {
+        <div class="table-scroll">
+          <table>
+            <thead><tr><th>PRODUCTO</th><th>TIPO</th><th>PRECIO</th><th>STOCK</th><th>ESTADO</th><th></th></tr></thead>
+            <tbody>
+              @for (product of filteredProducts(); track product.id) {
+                <tr>
+                  <td><strong>{{ product.name }}</strong><small>{{ product.description }}</small></td>
+                  <td><span class="tag">{{ product.type }}</span></td>
+                  <td><strong>{{ product.price | currency:'USD' }}</strong></td>
+                  <td>{{ product.stock }}</td>
+                  <td><span class="status" [class.low]="product.stock < 5">{{ product.stock > 0 ? (product.stock < 5 ? 'Stock bajo' : 'Disponible') : 'Agotado' }}</span></td>
+                  <td class="actions"><button (click)="openEdit(product)">Editar</button><button class="danger" (click)="remove(product)">Eliminar</button></td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      }
+    </section>
+  </main>
+</div>
+
+@if (modalOpen()) {
+  <div class="backdrop" (click)="modalOpen.set(false)">
+    <section class="modal" (click)="$event.stopPropagation()" role="dialog" aria-modal="true">
+      <div class="modal-head">
+        <div><span class="eyebrow">{{ editingId() ? 'EDITAR' : 'NUEVO' }}</span><h2>{{ editingId() ? 'Editar producto' : 'Agregar producto' }}</h2></div>
+        <button class="close" (click)="modalOpen.set(false)">×</button>
+      </div>
+      <form [formGroup]="form" (ngSubmit)="save()">
+        <label>Nombre<input formControlName="name" placeholder="Ej. Teclado mecánico"></label>
+        <label>Descripción<textarea formControlName="description" rows="3" placeholder="Describe el producto"></textarea></label>
+        <div class="form-grid">
+          <label>Precio<input type="number" min="0.01" step="0.01" formControlName="price"></label>
+          <label>Stock<input type="number" min="0" step="1" formControlName="stock"></label>
+        </div>
+        <label>Tipo de producto<input formControlName="type" placeholder="Ej. Tecnología"></label>
+        @if (form.touched && form.invalid) {
+          <p class="form-error">Completa todos los campos con valores válidos.</p>
+        }
+        <div class="modal-actions">
+          <button type="button" class="secondary" (click)="modalOpen.set(false)">Cancelar</button>
+          <button type="submit" class="primary" [disabled]="saving()">{{ saving() ? 'Guardando…' : 'Guardar producto' }}</button>
+        </div>
+      </form>
+    </section>
+  </div>
+}
