@@ -145,6 +145,6 @@ git init
 git add .
 git commit -m "feat: aplicación full stack de gestión de productos"
 git branch -M main
-git remote add origin https://github.com/TU-USUARIO/TU-REPOSITORIO.git
+git remote add origin https://github.com/dcanjura/PruebaTecnica.git
 git push -u origin main
 ```
